@@ -1,0 +1,89 @@
+{
+  "date": "2026-10-22",
+  "ccstatusline_version": "2.2.32",
+  "initial_live_sample": {
+    "duration_seconds": 134.5,
+    "claude_processes": 22,
+    "statusline_launches": 280,
+    "median_interval_seconds": 10
+  },
+  "initial_cli_measurements": [
+    {
+      "variant": "current",
+      "transcript": false,
+      "first_wall_ms": 347.36,
+      "median_wall_ms": 261.87,
+      "median_cpu_ms": 233.52
+    },
+    {
+      "variant": "cached",
+      "transcript": false,
+      "first_wall_ms": 267.52,
+      "median_wall_ms": 104.24,
+      "median_cpu_ms": 109.54
+    },
+    {
+      "variant": "no_custom",
+      "transcript": false,
+      "first_wall_ms": 105.48,
+      "median_wall_ms": 101.18,
+      "median_cpu_ms": 106.34
+    },
+    {
+      "variant": "minimal",
+      "transcript": false,
+      "first_wall_ms": 106.59,
+      "median_wall_ms": 97.9,
+      "median_cpu_ms": 103.52
+    },
+    {
+      "variant": "current",
+      "transcript": true,
+      "first_wall_ms": 323.4,
+      "median_wall_ms": 583.86,
+      "median_cpu_ms": 424.05
+    },
+    {
+      "variant": "cached",
+      "transcript": true,
+      "first_wall_ms": 172.89,
+      "median_wall_ms": 190.59,
+      "median_cpu_ms": 215.03
+    },
+    {
+      "variant": "no_custom",
+      "transcript": true,
+      "first_wall_ms": 237.93,
+      "median_wall_ms": 165.69,
+      "median_cpu_ms": 188.91
+    },
+    {
+      "variant": "minimal",
+      "transcript": true,
+      "first_wall_ms": 159.35,
+      "median_wall_ms": 152.21,
+      "median_cpu_ms": 172.21
+    },
+    {
+      "variant": "node_start",
+      "median_wall_ms": 44.14,
+      "median_cpu_ms": 41.62
+    },
+    {
+      "variant": "python_start",
+      "median_wall_ms": 12.59,
+      "median_cpu_ms": 9.8
+    },
+    {
+      "variant": "agent_name_script",
+      "median_wall_ms": 13.54,
+      "median_cpu_ms": 9.48
+    },
+    {
+      "variant": "branch_script",
+      "median_wall_ms": 30.46,
+      "median_cpu_ms": 18.76
+    }
+  ],
+  "notes": "Exploratory four-run CLI measurements. Synthetic input outside Claude did not exercise a successful agent-name lookup. Final benchmark.py validates live caller fixtures and should be used for comparisons."
+}

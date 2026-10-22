@@ -1,0 +1,7 @@
+{
+  "duration_seconds": 65.0,
+  "actual_claude_parent_processes": 23,
+  "actual_claude_old_statusline_node_pids_seen": 0,
+  "actual_claude_new_script_pids_seen": 21,
+  "scope": "Only direct children of actual claude processes; excludes Python benchmark callers."
+}

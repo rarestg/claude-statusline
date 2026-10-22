@@ -1,0 +1,67 @@
+{
+  "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+  "clients": 22,
+  "worktrees": 4,
+  "inputs": "Synthetic status JSON; no transcript. Real PID/process-start identity fixtures.",
+  "phases": {
+    "cold": {
+      "calls": 22,
+      "mean_cpu_ms": 52.333,
+      "median_wall_ms": 175.833,
+      "p95_wall_ms": 226.237,
+      "all_outputs_valid": true
+    },
+    "warm": {
+      "calls": 110,
+      "mean_cpu_ms": 19.895,
+      "median_wall_ms": 76.87,
+      "p95_wall_ms": 110.676,
+      "all_outputs_valid": true
+    },
+    "baseline": {
+      "calls": 66,
+      "mean_cpu_ms": 432.323,
+      "median_wall_ms": 757.044,
+      "p95_wall_ms": 1464.991,
+      "all_outputs_valid": true
+    },
+    "expired": {
+      "calls": 22,
+      "mean_cpu_ms": 31.899,
+      "median_wall_ms": 94.762,
+      "p95_wall_ms": 150.874,
+      "all_outputs_valid": true
+    }
+  },
+  "batch_wall_ms": {
+    "cold": [
+      244.36
+    ],
+    "warm": [
+      102.53,
+      134.41,
+      103.2,
+      100.53,
+      112.17
+    ],
+    "baseline": [
+      1478.6,
+      767.56,
+      812.42
+    ],
+    "expired": [
+      156.86
+    ]
+  },
+  "warm_helper_calls_per_request": {
+    "ps": 1,
+    "jq": 1,
+    "date": 1
+  },
+  "runtime_sha256": "91757d6a15ab53adea998760554623af6480771854b70984c4b38b1a0e6172b2",
+  "runtime_unchanged_during_measurement": true,
+  "warm_cpu_reduction_percent": 95.4,
+  "expired_cpu_reduction_percent": 92.62,
+  "cpu_reduction_phase": "warm",
+  "cpu_reduction_percent": 95.4
+}

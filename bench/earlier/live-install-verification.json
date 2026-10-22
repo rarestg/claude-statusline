@@ -1,0 +1,16 @@
+{
+  "duration_seconds": 125.2,
+  "live_claude_processes_seen": 23,
+  "replacement_script_pids_seen": 41,
+  "old_statusline_nodes_seen": 0,
+  "live_identity_cache_entries_checked": 23,
+  "identity_cache_entries_match_registry": true,
+  "settings_only_statusline_changed": true,
+  "backup_directory": "~/.claude/statusline-backups/20261022T115117-42854-31880",
+  "runtime_sha256": "72a11ca2fab726b9c2854bc93603918d85e7288d1db96d2e734b12cb4fba3635",
+  "sampling_interval_seconds": 0.2,
+  "note": "Sampling can miss short-lived processes; identity-cache checks independently confirm live hook invocations. Ref verification preserves the preexisting socket-based formula, not an independent /list-agents lookup. The wrapper counter is unfiltered and includes legacy baseline benchmark activity. Use live-process-verification.json for counts restricted to actual Claude parents.",
+  "unfiltered_custom_command_node_wrappers_seen": 30,
+  "unfiltered_wrapper_count_includes_benchmark_activity": true,
+  "process_ancestry_verification": "live-process-verification.json"
+}
