@@ -36,6 +36,7 @@ class InstallTests(StatusTest):
         p = self.install(); self.assertEqual(p.returncode, 0, p.stderr)
         installed = json.loads(self.settings.read_text())
         self.assertEqual(installed['hooks'], self.initial['hooks'])
+        self.assertEqual(installed['statusLine']['refreshInterval'], 30)
         self.assertEqual(self.settings.stat().st_mode & 0o777, 0o640)
         self.assertTrue(self.destination.exists())
         self.assertIn('Already installed', self.install().stdout)

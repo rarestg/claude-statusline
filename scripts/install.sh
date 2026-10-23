@@ -25,7 +25,7 @@ current='{}'
 [[ ! -f $target ]] || current=$(cat "$target")
 jq -e 'type == "object"' <<< "$current" >/dev/null || fail 'Settings must contain a JSON object.'
 quoted_destination=${destination//\'/\'\\\'\'}
-desired=$(jq -nc --arg command "exec /bin/bash '$quoted_destination'" '{type:"command",command:$command,padding:0,refreshInterval:10}')
+desired=$(jq -nc --arg command "exec /bin/bash '$quoted_destination'" '{type:"command",command:$command,padding:0,refreshInterval:30}')
 if jq -e --argjson desired "$desired" '.statusLine == $desired' <<< "$current" >/dev/null && [[ -f $destination ]] && cmp -s "$runtime" "$destination"; then
     printf 'Already installed.\n'; exit 0
 fi

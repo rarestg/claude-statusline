@@ -8,7 +8,7 @@ yellowtail-f5 [8d651c] · Opus 5.5 · high
 ~/code/my-app · 3f2a9c1e-7b4d-4e2a-9c1f-5d8e6b0a4c21
 ```
 
-It replaces a [ccstatusline](https://github.com/sirmalloc/ccstatusline) setup that cost 0.3–0.45 s of CPU per refresh. Claude Code refreshes each session's status line every 10 seconds, so with 20+ sessions open, CPU spiked every 10 seconds. With 22 sessions refreshing at once, this script costs about 20 ms per refresh. See [Measurements](#measurements).
+It replaces a [ccstatusline](https://github.com/sirmalloc/ccstatusline) setup that cost 0.3–0.45 s of CPU per refresh and refreshed every session's status line every 10 seconds, so with 20+ sessions open, CPU spiked every 10 seconds. With 22 sessions refreshing at once, this script costs about 20 ms per refresh. See [Measurements](#measurements).
 
 ## What it shows
 
@@ -45,7 +45,7 @@ To set it up by hand, copy `statusline.sh` to `~/.claude/` and add this to your 
     "type": "command",
     "command": "exec /bin/bash ~/.claude/statusline.sh",
     "padding": 0,
-    "refreshInterval": 10
+    "refreshInterval": 30
   }
 }
 ```
@@ -60,6 +60,7 @@ This restores the previous `statusLine` value and the previous `~/.claude/status
 
 ## How it stays cheap
 
+- **Idle sessions refresh every 30 seconds.** Claude Code reruns the status line on each new assistant message and a few other events. The installer also sets `refreshInterval: 30`, so an idle session still picks up Git changes made outside it, such as by another session in the same worktree. Change `refreshInterval` in `statusLine` to refresh more or less often.
 - **Session values come from Claude Code's input.** Model, effort, cost, context, and the PR URL arrive in the JSON that Claude Code sends on every refresh. The script never caches a rendered line, so these are always current.
 - **The address is checked on every refresh, and the hash is computed once.** The script walks up its parent processes to its Claude Code process and reads that process's registry file in `~/.claude/sessions/`. One `ps` call confirms the PID, session ID, and process start time, which catches a reused PID. The hash is cached per process and socket path. Because the registry file is read every time, a `/rename` shows up on the next refresh.
 - **Sessions in the same worktree share Git counts.** When the cached counts are more than 10 seconds old, the first session to notice takes a `mkdir` lock and refreshes them. The others keep showing the cached counts and don't wait. Linked worktrees have separate caches. The branch and `HEAD` are read with Bash builtins, without starting Git.
