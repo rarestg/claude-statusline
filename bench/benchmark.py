@@ -60,7 +60,9 @@ def worker(connection, index, root, cwd, script, baseline):
         if kind != 'baseline':
             home = str(Path.home())
             display_cwd = '~' + cwd[len(home):] if cwd == home or cwd.startswith(home + '/') else cwd
-            valid = valid and '420k/1.0M (42%)' in plain and plain.splitlines()[-1] == display_cwd
+            # The session ID follows the directory when it fits in 120 columns.
+            line3 = display_cwd + (f' · {sid}' if len(display_cwd) + 3 + len(sid) <= 120 else '')
+            valid = valid and '420k/1.0M (42%)' in plain and plain.splitlines()[-1] == line3
         result = dict(wall_ms=wall, cpu_ms=1000 * (after.ru_utime + after.ru_stime - before.ru_utime - before.ru_stime),
                       valid=valid)
         if not valid:

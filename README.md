@@ -5,7 +5,7 @@ A Claude Code status line that stays cheap when you run many sessions at once. I
 ```text
 yellowtail-f5 [8d651c] · Opus 5.5 · high
 ⎇ fix-login · PR #42 · +12 −3 · $4.12 · [████░░░░░░] 84k/200k (42%)
-~/code/my-app
+~/code/my-app · 3f2a9c1e-7b4d-4e2a-9c1f-5d8e6b0a4c21
 ```
 
 It replaces a [ccstatusline](https://github.com/sirmalloc/ccstatusline) setup that cost 0.3–0.45 s of CPU per refresh. Claude Code refreshes each session's status line every 10 seconds, so with 20+ sessions open, CPU spiked every 10 seconds. With 22 sessions refreshing at once, this script costs about 20 ms per refresh. See [Measurements](#measurements).
@@ -14,13 +14,13 @@ It replaces a [ccstatusline](https://github.com/sirmalloc/ccstatusline) setup th
 
 - **Line 1:** the session's `/list-agents` address, the name other sessions use to message it, then the model and effort level.
 - **Line 2:** the Git branch, a clickable `PR #…` badge when Claude Code reports an open PR, staged plus unstaged line changes, session cost, and context usage.
-- **Line 3:** the current directory, with your home directory shortened to `~`. It's a `file://` link, so terminals that support file links can open it.
+- **Line 3:** the current directory, with your home directory shortened to `~`, then the session ID, which `claude --resume` takes. The directory is a `file://` link, so terminals that support file links can open it.
 
 Context usage adds up the current input, cache creation, and cache read tokens. It leaves out output tokens and session totals. When Claude Code supplies a percentage, the script shows that one.
 
-On narrow terminals, the context bar shrinks first, then optional details drop out. The address and directory always stay; long paths may wrap.
+On narrow terminals, the context bar shrinks first, then optional details drop out. The address and directory always stay; long paths may wrap. The session ID drops out when it doesn't fit after the directory.
 
-If the script can't verify which Claude Code process it belongs to, line 1 shows `session <session ID>` instead of an address. A wrong address would send other sessions' messages to the wrong place.
+If the script can't verify which Claude Code process it belongs to, line 1 shows `session <session ID>` instead of an address, and line 3 doesn't repeat the ID. A wrong address would send other sessions' messages to the wrong place.
 
 ## Install
 
@@ -97,11 +97,11 @@ CPU per call, including child processes. These were measured on an 18-core Apple
 
 | Case | This script | Previous ccstatusline setup |
 | --- | ---: | ---: |
-| Warm caches | 18.3 ms | 446 ms |
-| Git counts expired | 35.5 ms | 446 ms |
-| First run, empty caches | 39.7 ms | — |
+| Warm caches | 19.2 ms | 404 ms |
+| Git counts expired | 32.7 ms | 404 ms |
+| First run, empty caches | 41.9 ms | — |
 
-A single caller with warm caches costs 13.2 ms. The ccstatusline column is version 2.2.32 running the layout this script replaces. It got no transcript, so the comparison favors it. With a real transcript, ccstatusline also parses the whole file on every refresh. Raw numbers are in [bench/results.json](bench/results.json) and [bench/single-client-results.json](bench/single-client-results.json). [bench/earlier/](bench/earlier/) holds results from earlier versions of the script.
+A single caller with warm caches costs 12.7 ms. The ccstatusline column is version 2.2.32 running the layout this script replaces. It got no transcript, so the comparison favors it. With a real transcript, ccstatusline also parses the whole file on every refresh. Raw numbers are in [bench/results.json](bench/results.json) and [bench/single-client-results.json](bench/single-client-results.json). [bench/earlier/](bench/earlier/) holds results from earlier versions of the script.
 
 ## Tests and benchmarks
 

@@ -6,56 +6,51 @@
   "phases": {
     "cold": {
       "calls": 1,
-      "mean_cpu_ms": 64.341,
-      "median_wall_ms": 126.226,
-      "p95_wall_ms": 126.226,
+      "mean_cpu_ms": 59.886,
+      "median_wall_ms": 121.799,
+      "p95_wall_ms": 121.799,
       "all_outputs_valid": true
     },
     "warm": {
-      "calls": 10,
-      "mean_cpu_ms": 13.241,
-      "median_wall_ms": 20.355,
-      "p95_wall_ms": 22.378,
+      "calls": 5,
+      "mean_cpu_ms": 12.653,
+      "median_wall_ms": 19.365,
+      "p95_wall_ms": 20.562,
       "all_outputs_valid": true
     },
     "baseline": {
       "calls": 3,
-      "mean_cpu_ms": 273.873,
-      "median_wall_ms": 288.716,
-      "p95_wall_ms": 521.042,
+      "mean_cpu_ms": 249.763,
+      "median_wall_ms": 256.251,
+      "p95_wall_ms": 498.601,
       "all_outputs_valid": true
     },
     "expired": {
       "calls": 1,
-      "mean_cpu_ms": 54.083,
-      "median_wall_ms": 85.177,
-      "p95_wall_ms": 85.177,
+      "mean_cpu_ms": 51.091,
+      "median_wall_ms": 81.925,
+      "p95_wall_ms": 81.925,
       "all_outputs_valid": true
     }
   },
   "batch_wall_ms": {
     "cold": [
-      126.51
+      122.1
     ],
     "warm": [
-      19.24,
-      20.83,
-      22.56,
-      19.13,
-      19.6,
-      18.91,
-      21.45,
-      21.77,
-      21.8,
-      20.23
+      19.44,
+      20.14,
+      19.52,
+      19.4,
+      20.88
     ],
     "baseline": [
-      521.16,
-      288.86,
-      279.48
+      498.74,
+      256.38,
+      255.42
     ],
     "expired": [
-      85.37
+      82.12
     ]
   },
   "warm_helper_calls_per_request": {
@@ -63,10 +58,10 @@
     "jq": 1,
     "date": 1
   },
-  "runtime_sha256": "1d8f9c744311bfb5d6cd5ba82e7bbc7f53a2e8bdea9b61f27b6c8edc5638b607",
+  "runtime_sha256": "86d341ab3dd099b55d326e370fd564e0ceff259f3085cb86af4b92f374506cba",
   "runtime_unchanged_during_measurement": true,
-  "warm_cpu_reduction_percent": 95.17,
-  "expired_cpu_reduction_percent": 80.25,
+  "warm_cpu_reduction_percent": 94.93,
+  "expired_cpu_reduction_percent": 79.54,
   "cpu_reduction_phase": "warm",
-  "cpu_reduction_percent": 95.17
+  "cpu_reduction_percent": 94.93
 }

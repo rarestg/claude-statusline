@@ -210,14 +210,37 @@ class RenderTests(StatusTest):
                                ('/Users/fixture/folder', '~/folder'),
                                ('/Users/fixture-other/folder', '/Users/fixture-other/folder')]:
             self.data['workspace']['current_dir'] = path
-            self.assertEqual(self.run_status(env={'HOME': '/Users/fixture'}).splitlines()[-1], expected)
+            self.assertEqual(self.run_status(env={'HOME': '/Users/fixture'}).splitlines()[-1], expected + ' · ' + self.sid)
 
     def test_directory_falls_back_to_cwd_and_is_optional(self):
         self.data.pop('workspace')
         self.data['cwd'] = '/tmp/example'
-        self.assertEqual(self.run_status().splitlines()[-1], '/tmp/example')
+        self.assertEqual(self.run_status().splitlines()[-1], '/tmp/example · ' + self.sid)
         self.data.pop('cwd')
         self.assertEqual(len(self.run_status().splitlines()), 2)
+
+    def test_session_id_follows_directory_only_when_it_fits(self):
+        self.data['workspace']['current_dir'] = '/tmp/example'
+        line = '/tmp/example · ' + self.sid
+        self.assertEqual(self.run_status(env={'COLUMNS': str(len(line))}).splitlines()[-1], line)
+        self.assertEqual(self.run_status(env={'COLUMNS': str(len(line) - 1)}).splitlines()[-1], '/tmp/example')
+
+    def test_session_id_is_not_repeated_when_line_1_shows_it(self):
+        self.record['sessionId'] = 'another-session'
+        self.write_registry()
+        self.data['workspace']['current_dir'] = '/tmp/example'
+        lines = self.run_status().splitlines()
+        self.assertTrue(lines[0].startswith('session ' + self.sid))
+        self.assertEqual(lines[-1], '/tmp/example')
+
+    def test_session_id_is_colored_and_outside_the_directory_link(self):
+        self.data['workspace']['current_dir'] = '/tmp/example'
+        env = {k: v for k, v in self.env.items() if k != 'NO_COLOR'}
+        p = subprocess.run(['/bin/bash', str(SCRIPT)], input=json.dumps(self.data), text=True,
+                           capture_output=True, env=env)
+        self.assertEqual((p.returncode, p.stderr), (0, ''))
+        self.assertTrue(p.stdout.splitlines()[-1].endswith(
+            '\x1b]8;;\x1b\\\x1b[0m\x1b[38;5;244m · \x1b[0m\x1b[38;5;67m' + self.sid + '\x1b[0m'))
 
     def test_branch_with_c1_controls_is_hidden(self):
         self.init_git()

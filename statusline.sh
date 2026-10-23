@@ -321,10 +321,11 @@ fi
 
 # Rendering stays in Bash; jq has already sanitized session text and numbers.
 if [[ ${NO_COLOR+x} || ${CLAUDE_STATUSLINE_COLOR:-1} == 0 ]]; then
-    accent= dim= green= red= reset= model_color= effort_color= branch_color= context_color=
+    accent= dim= green= red= reset= model_color= effort_color= branch_color= context_color= id_color=
 else
     accent=$'\033[38;5;166m' dim=$'\033[38;5;244m' green=$'\033[38;5;28m' red=$'\033[38;5;160m' reset=$'\033[0m'
     model_color=$'\033[38;5;99m' effort_color=$'\033[38;5;30m' branch_color=$'\033[38;5;169m' context_color=$'\033[38;5;32m'
+    id_color=$'\033[38;5;67m'
 fi
 width=${COLUMNS:-120}
 [[ $width =~ ^[0-9]{1,4}$ ]] || width=120
@@ -422,9 +423,16 @@ if [[ -n $cwd ]]; then
     directory_text=$cwd
     if [[ $cwd == "$HOME" ]]; then directory_text='~'
     elif [[ $cwd == "$HOME/"* ]]; then directory_text="~/${cwd#"$HOME/"}"; fi
+    # The session ID follows the directory when it fits. Line 1 already shows
+    # it when the address can't be verified. Byte counts overstate non-ASCII
+    # paths, so those drop the ID a little early.
+    session_text=
+    if [[ -n $name && -n $ref && -n $sid ]] && (( ${#directory_text} + 3 + ${#sid} <= width )); then
+        session_text="$dim · $reset$id_color$sid$reset"
+    fi
     if [[ ${CLAUDE_STATUSLINE_LINKS:-1} == 1 && -n $cwd_url && -n $accent ]]; then
         directory_text=$'\033]8;;'"$cwd_url"$'\033\\'"$directory_text"$'\033]8;;\033\\'
     fi
-    printf '%s%s%s\n' "$dim" "$directory_text" "$reset"
+    printf '%s%s%s%s\n' "$dim" "$directory_text" "$reset" "$session_text"
 fi
 exit 0
