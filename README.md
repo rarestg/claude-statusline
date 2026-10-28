@@ -1,6 +1,6 @@
 # claude-statusline
 
-A Claude Code status line that stays cheap when you run many sessions at once. It's one Bash script. A warm refresh starts `ps` and `jq`, plus `date` on Bash older than 5.0, like the one macOS ships. It starts no Node process, reads no transcripts, makes no network requests, and runs no daemon.
+A Claude Code status line that stays cheap when you run many sessions at once. It's one Bash script. A warm refresh starts `jq`, plus `ps` on macOS and `date` on Bash older than 5.0, like the one macOS ships. It starts no Node process, reads no transcripts, makes no network requests, and runs no daemon.
 
 ```text
 yellowtail-f5 [8d651c] · Opus 5.5 · high
@@ -24,7 +24,7 @@ If the script can't verify which Claude Code process it belongs to, line 1 shows
 
 ## Install
 
-You need Bash 3.2 or newer at `/bin/bash`, `jq`, Git, `ps`, `date`, and `sha256sum` or `shasum`. Git refreshes also use `mkfifo` and other standard utilities. It's tested on macOS 26.5.1 with the system Bash 3.2 and Claude Code 2.1.306. Linux should work, but it hasn't been tested.
+You need Bash 3.2 or newer at `/bin/bash`, `jq`, Git, `ps`, `date`, and `sha256sum` or `shasum`. Git refreshes also use `mkfifo` and other standard utilities. It's tested on macOS 26.5.1 with the system Bash 3.2 and Claude Code 2.1.306, and on Linux with Bash 5.2 and Claude Code 2.1.312.
 
 ```sh
 git clone https://github.com/rarestg/claude-statusline.git
@@ -62,7 +62,7 @@ This restores the previous `statusLine` value and the previous `~/.claude/status
 
 - **Idle sessions refresh every 30 seconds.** Claude Code reruns the status line on each new assistant message and a few other events. The installer also sets `refreshInterval: 30`, so an idle session still picks up Git changes made outside it, such as by another session in the same worktree. Change `refreshInterval` in `statusLine` to refresh more or less often.
 - **Session values come from Claude Code's input.** Model, effort, cost, context, and the PR URL arrive in the JSON that Claude Code sends on every refresh. The script never caches a rendered line, so these are always current.
-- **The address is checked on every refresh, and the hash is computed once.** The script walks up its parent processes to its Claude Code process and reads that process's registry file in `~/.claude/sessions/`. One `ps` call confirms the PID, session ID, and process start time, which catches a reused PID. The hash is cached per process and socket path. Because the registry file is read every time, a `/rename` shows up on the next refresh.
+- **The address is checked on every refresh, and the hash is computed once.** The script walks up its parent processes to its Claude Code process and reads that process's registry file in `~/.claude/sessions/`. One `ps` call on macOS, or one read of `/proc/<pid>/stat` on Linux, confirms the PID, session ID, and process start time, which catches a reused PID. The hash is cached per process and socket path. Because the registry file is read every time, a `/rename` shows up on the next refresh.
 - **Sessions in the same worktree share Git counts.** When the cached counts are more than 10 seconds old, the first session to notice takes a `mkdir` lock and refreshes them. The others keep showing the cached counts and don't wait. Linked worktrees have separate caches. The branch and `HEAD` are read with Bash builtins, without starting Git.
 - **Git work is bounded.** Each `git diff` has a 2-second deadline, enforced by a watchdog that survives even if the status line itself is killed. A failed refresh backs off for 5 seconds, and a lock left by a killed process is recovered. If two sessions reclaim a stale lock at the same moment, both refresh, but each writes to its own work directory and only one publishes. These calls turn off optional locks, fsmonitor, external diff tools, and textconv, and run the index check on one thread (`core.preloadIndex=false`, `index.threads=1`). In large repositories, Git's parallel index preload used hundreds of milliseconds of CPU to save a few dozen milliseconds of wall time. The settings apply to these calls only; your Git config isn't changed.
 
@@ -87,7 +87,7 @@ Set these in the `statusLine` command, for example `"command": "CLAUDE_STATUSLIN
 
 - **The address relies on undocumented Claude Code internals:** the registry files in `~/.claude/sessions/` and the formula for the `[ref]`. The script doesn't handle the `tengu_session_stable_address` feature flag or the longer refs `/list-agents` uses when two collide. After upgrading Claude Code, check line 1 against `/list-agents` before you rely on it. [docs/compatibility.md](docs/compatibility.md) has the details.
 - **Git clean filters still run.** A clean filter set in a repository's config and `.gitattributes`, such as Git LFS, runs during the diff, the same as when you run `git diff` there yourself.
-- **Linux is untested.** The installed command calls `/bin/bash`, which NixOS doesn't have. BusyBox `ps`, as on Alpine, can't report process start times, so line 1 falls back to the session ID.
+- **Linux is lightly tested.** The installed command calls `/bin/bash`, which NixOS doesn't have. On Linux, `ps` runs only when the parent walk has to cross a wrapper process, which an `exec` install never does. BusyBox `ps`, as on Alpine, hasn't been tried.
 - **Caches assume one machine.** If `~/.cache` is shared between machines or containers, a lock held on one can look abandoned from another. Counts stay correct, but refreshes may repeat.
 - Bare repositories and custom `GIT_DIR` or `GIT_WORK_TREE` layouts aren't supported.
 - There's no widget or layout configuration. To change the layout, edit the script.
