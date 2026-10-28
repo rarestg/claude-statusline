@@ -11,6 +11,15 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / 'statusline.sh'
 
 
+def proc_start(pid):
+    """What Claude Code records as procStart: /proc/<pid>/stat field 22 on Linux, ps lstart elsewhere."""
+    stat = Path(f'/proc/{pid}/stat')
+    if stat.exists():
+        return stat.read_text().rsplit(')', 1)[1].split()[19]
+    return ' '.join(subprocess.check_output(['ps', '-p', str(pid), '-o', 'lstart='], text=True,
+                                            env={**os.environ, 'TZ': 'UTC'}).split())
+
+
 class StatusTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(prefix='claude-statusline-test-')
@@ -23,8 +32,7 @@ class StatusTest(unittest.TestCase):
         self.cwd.mkdir()
         self.sid = 'session-under-test'
         self.pid = os.getpid()
-        self.start = ' '.join(subprocess.check_output(['ps', '-p', str(self.pid), '-o', 'lstart='], text=True,
-                                                     env={**os.environ, 'TZ': 'UTC'}).split())
+        self.start = proc_start(self.pid)
         self.record = dict(pid=self.pid, procStart=self.start, sessionId=self.sid,
                            name='yellowtail-f5', messagingSocketPath='/tmp/fictional-statusline.sock')
         self.write_registry()

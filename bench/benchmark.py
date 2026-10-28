@@ -20,12 +20,20 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def proc_start(pid):
+    """What Claude Code records as procStart: /proc/<pid>/stat field 22 on Linux, ps lstart elsewhere."""
+    stat = Path(f'/proc/{pid}/stat')
+    if stat.exists():
+        return stat.read_text().rsplit(')', 1)[1].split()[19]
+    return ' '.join(subprocess.check_output(['ps', '-p', str(pid), '-o', 'lstart='], text=True,
+                                            env={**os.environ, 'TZ': 'UTC'}).split())
+
+
 def worker(connection, index, root, cwd, script, baseline):
     root = Path(root)
     pid = os.getpid()
     sid = f'benchmark-session-{index}'
-    start = ' '.join(subprocess.check_output(['ps', '-p', str(pid), '-o', 'lstart='], text=True,
-                                            env={**os.environ, 'TZ': 'UTC'}).split())
+    start = proc_start(pid)
     (root / 'registry' / f'{pid}.json').write_text(json.dumps(dict(
         pid=pid, sessionId=sid, procStart=start, name=f'fixture-agent-{index}',
         messagingSocketPath=f'/tmp/benchmark-agent-{index}.sock')))

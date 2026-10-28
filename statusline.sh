@@ -13,6 +13,21 @@ if [[ $deadline =~ ^[0-9]{1,2}$ ]]; then deadline=$((10#$deadline)); else deadli
 (( ttl >= 1 && ttl <= 60 )) || ttl=10
 (( deadline >= 1 && deadline <= 10 )) || deadline=2
 
+# A process's start time in the form Claude Code records as procStart: field 22
+# of /proc/<pid>/stat (clock ticks since boot) on Linux, `ps -o lstart=` elsewhere.
+proc_start() {
+    local line words
+    proc_start_result=
+    if [[ -r /proc/$1/stat ]]; then
+        { IFS= read -r line < "/proc/$1/stat"; } 2>/dev/null || :
+        read -r -a words <<< "${line##*) }"
+        [[ ${words[19]-} =~ ^[0-9]+$ ]] && proc_start_result=${words[19]}
+    else
+        read -r -a words <<< "$(ps -p "$1" -o lstart= 2>/dev/null)"
+        proc_start_result=${words[*]-}
+    fi
+}
+
 # Bound stdin. Bash's read avoids a separate cat process.
 input=
 IFS= read -r -d '' -n 1048577 input || :
@@ -30,9 +45,7 @@ registry=
 for (( depth=0; depth<6 && candidate>1; depth++ )); do
     if [[ -f $registry_root/$candidate.json ]]; then
         registry=$registry_root/$candidate.json
-        actual_start=$(ps -p "$candidate" -o lstart= 2>/dev/null)
-        read -r -a start_words <<< "$actual_start"
-        actual_start=${start_words[*]}
+        proc_start "$candidate"; actual_start=$proc_start_result
         kill -0 "$candidate" 2>/dev/null || actual_start=
         break
     fi
@@ -252,9 +265,8 @@ if [[ -n $root && -f $gitdir/HEAD ]]; then
                         if ! kill -0 "$owner_pid" 2>/dev/null; then
                             dead_owner=1
                         elif [[ ! $owner_created =~ ^[0-9]{1,12}$ ]] || (( now - owner_created > deadline * 2 + 5 || owner_created > now )); then
-                            live_owner_start=$(ps -p "$owner_pid" -o lstart= 2>/dev/null)
-                            read -r -a owner_words <<< "$live_owner_start"
-                            [[ ${owner_words[*]} == "$owner_start" ]] || dead_owner=1
+                            proc_start "$owner_pid"
+                            [[ $proc_start_result == "$owner_start" ]] || dead_owner=1
                         fi
                     else
                         if [[ $OSTYPE == darwin* ]]; then lock_mtime=$(stat -f %m "$lock/owner" 2>/dev/null); else lock_mtime=$(stat -c %Y "$lock/owner" 2>/dev/null); fi
@@ -276,9 +288,8 @@ if [[ -n $root && -f $gitdir/HEAD ]]; then
             fi
             if mkdir "$lock" 2>/dev/null; then
                 lock_token=$$.$now.$RANDOM
-                this_start=$(ps -p "$$" -o lstart= 2>/dev/null)
-                read -r -a this_words <<< "$this_start"
-                { printf '%s\n%s\n%s\n%s\n' "$lock_token" "$$" "${this_words[*]}" "$now" > "$lock/owner"; } 2>/dev/null
+                proc_start "$$"
+                { printf '%s\n%s\n%s\n%s\n' "$lock_token" "$$" "$proc_start_result" "$now" > "$lock/owner"; } 2>/dev/null
                 # Remove work directories left by owners that were killed.
                 for stale_work in "$git_cache"/work.*; do
                     [[ -d $stale_work ]] || continue
