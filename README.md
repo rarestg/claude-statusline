@@ -87,7 +87,7 @@ Set these in the `statusLine` command, for example `"command": "CLAUDE_STATUSLIN
 
 - **The address relies on undocumented Claude Code internals:** the registry files in `~/.claude/sessions/` and the formula for the `[ref]`. The script doesn't handle the `tengu_session_stable_address` feature flag or the longer refs `/list-agents` uses when two collide. After upgrading Claude Code, check line 1 against `/list-agents` before you rely on it. [docs/compatibility.md](docs/compatibility.md) has the details.
 - **Git clean filters still run.** A clean filter set in a repository's config and `.gitattributes`, such as Git LFS, runs during the diff, the same as when you run `git diff` there yourself.
-- **Linux is lightly tested.** The installed command calls `/bin/bash`, which NixOS doesn't have. BusyBox `ps`, as on Alpine, hasn't been tried.
+- **Linux is lightly tested.** The installed command calls `/bin/bash`, which NixOS doesn't have. On Linux, `ps` runs only when the parent walk has to cross a wrapper process, which an `exec` install never does. BusyBox `ps`, as on Alpine, hasn't been tried.
 - **Caches assume one machine.** If `~/.cache` is shared between machines or containers, a lock held on one can look abandoned from another. Counts stay correct, but refreshes may repeat.
 - Bare repositories and custom `GIT_DIR` or `GIT_WORK_TREE` layouts aren't supported.
 - There's no widget or layout configuration. To change the layout, edit the script.

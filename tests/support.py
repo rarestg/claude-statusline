@@ -17,7 +17,7 @@ def proc_start(pid):
     if stat.exists():
         return stat.read_text().rsplit(')', 1)[1].split()[19]
     return ' '.join(subprocess.check_output(['ps', '-p', str(pid), '-o', 'lstart='], text=True,
-                                            env={**os.environ, 'TZ': 'UTC'}).split())
+                                            env={**os.environ, 'LC_ALL': 'C', 'TZ': 'UTC'}).split())
 
 
 class StatusTest(unittest.TestCase):
